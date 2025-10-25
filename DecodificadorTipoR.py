@@ -6,13 +6,13 @@ Operaciones = {
     "sub": "100010",
     "or": "001101"
 }
-def ventana():
-    exito=tkinter.Tk()
+"""def ventana():
+    exito= tkinter.Tk()
     exito.tkinter()
     exito.title("¡Se ha creado el archivo!")
     exito.geometry("200x100")
     
-    boton2= tkinter.Button(exito, text=("regresar"), command=exit)
+    boton2= tkinter.Button(exito, text=("regresar"), command=exit)"""
 
 # Función para convertir la instrucción
 def convertir(instruccion):
@@ -35,7 +35,7 @@ def convertir(instruccion):
             instruccion_completa = op + bin_rs + bin_rt + bin_rd + shft + funct
             with open("Binarios.txt", "w") as binarios:
                 binarios.write(instruccion_completa+"\n")
-                ventana()
+                
                 
             mostrar_resultado(instruccion_completa)
             
