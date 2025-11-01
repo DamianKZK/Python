@@ -1,21 +1,13 @@
 import tkinter
+from tkinter import filedialog
 
-# Diccionario de operaciones
 Operaciones = {
     "add": "100000",
     "sub": "100010",
     "or": "001101"
 }
-"""def ventana():
-    exito= tkinter.Tk()
-    exito.tkinter()
-    exito.title("¡Se ha creado el archivo!")
-    exito.geometry("200x100")
-    
-    boton2= tkinter.Button(exito, text=("regresar"), command=exit)"""
 
-# Función para convertir la instrucción
-def convertir(instruccion):
+def decodificar_linea(instruccion):
     try:
         partes = instruccion.replace(",", "").split()
         operacion = partes[0].lower()
@@ -32,22 +24,54 @@ def convertir(instruccion):
             bin_rt = format(rt, '05b')
             bin_rd = format(rd, '05b')
 
-            instruccion_completa = op + bin_rs + bin_rt + bin_rd + shft + funct
-            with open("Binarios.txt", "w") as binarios:
-                binarios.write(instruccion_completa+"\n")
-                
-                
-            mostrar_resultado(instruccion_completa)
-            
-            
+            return op + bin_rs + bin_rt + bin_rd + shft + funct
         else:
-            mostrar_resultado("Operación no reconocida.")
+            return "Operación no reconocida"
     except Exception as e:
-        mostrar_resultado(f"Error: {e}")
-# Función para mostrar el resultado
+        return f"Error: {e}"
+
+def convertir_manual():
+    instrucciones = entrada.get("1.0", "end-1c").strip().splitlines()
+    resultado = ""
+    for idx, linea in enumerate(instrucciones, start=1):
+        if linea.strip():
+            binario = decodificar_linea(linea)
+            resultado += f"Instrucción {idx}: {binario}\n"
+    mostrar_resultado(resultado)
+
 def mostrar_resultado(res):
     entrada.delete("1.0", tkinter.END)
     entrada.insert(tkinter.END, res)
+
+def Seleccionar():
+    ruta = filedialog.askopenfilename(
+        title="Selecciona un archivo de texto",
+        filetypes=[("Archivos de texto", "*.txt")]
+    )
+    if ruta:
+        resultado = ""
+        try:
+            with open(ruta, "r") as archivo:
+                lineas = archivo.readlines()
+                for idx, linea in enumerate(lineas, start=0):
+                    linea = linea.strip()
+                    if linea:
+                        binario = decodificar_linea(linea)
+                        resultado += f"Instrucción {idx}: {binario}\n"
+            mostrar_resultado(resultado)
+        except Exception as e:
+            mostrar_resultado(f"Error al abrir el archivo: {e}")
+
+def guardar():
+    contenido = entrada.get("1.0", "end-1c")
+    with open("Binarios.txt", "a") as binarios:
+        binarios.write(contenido + "\n")
+    ventana_exito = tkinter.Toplevel()
+    ventana_exito.configure(bg="grey30")
+    ventana_exito.title("¡Archivo Guardado!")
+    ventana_exito.geometry("300x150")
+    TextoE = tkinter.Label(ventana_exito, text="¡Archivo guardado exitosamente!", bg="royalblue", fg="white", font=("BOLD", 13))
+    TextoE.pack(pady=50)
 
 # Interfaz gráfica
 ventana = tkinter.Tk()
@@ -55,16 +79,28 @@ ventana.title("Decodificador")
 ventana.geometry("500x500")
 ventana.configure(bg="grey20")
 
-etiqueta = tkinter.Label(ventana, text="Decodificador de instrucciones tipo R", fg="white", font=("TimesNewRoman", 20), bg="gray10")
+etiqueta = tkinter.Label(ventana, text="Decodificador de instrucciones tipo R", fg="white", font=("TimesNewRoman", 20), bg="grey10")
 etiqueta.pack(fill=tkinter.X)
 
-TextoB = tkinter.Label(ventana, text="Ingrese su instrucción (ej. add $1, $2, $3)", bg="blue", fg="white", font=("BOLD", 13))
-TextoB.pack()
+TextoB = tkinter.Label(ventana, text="Ingrese una o más instrucciones (ej. add $1, $2, $3)", bg="royalblue", fg="white", font=("BOLD", 13))
+TextoB.pack(pady=10)
 
 entrada = tkinter.Text(ventana, width=50, height=10, bg="grey50")
-entrada.pack()
+entrada.pack(pady=5)
 
-boton = tkinter.Button(ventana, text="Submit", command=lambda: convertir(entrada.get("1.0", "end-1c")), bg="blue")
-boton.pack()
+botonD = tkinter.Button(ventana, text="Decodificar", command=convertir_manual, bg="darkblue", fg="white")
+botonD.place(relx=0.5, rely=0.65, anchor="center")
+
+TextoO = tkinter.Label(ventana, text="O también puede:", bg="royalblue", fg="white", font=("BOLD", 13))
+TextoO.pack(pady=10)
+
+botonT = tkinter.Button(ventana, text="Ingresar su archivo de texto", command=Seleccionar, bg="darkblue", fg="white")
+botonT.place(relx=0.5, rely=0.75, anchor="center")
+
+botonG = tkinter.Button(ventana, text="Guardar", command=guardar, bg="darkblue", fg="white")
+botonG.place(relx=0.95, rely=0.95, anchor="se")
+
+botonS = tkinter.Button(ventana, text="Salir", command=ventana.quit, bg="darkblue", fg="white")
+botonS.place(relx=0.05, rely=0.95, anchor="sw")
 
 ventana.mainloop()
