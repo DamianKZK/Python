@@ -11,22 +11,25 @@ def decodificar_linea(instruccion):
     try:
         partes = instruccion.replace(",", "").split()
         operacion = partes[0].lower()
-        if operacion in Operaciones:
-            rd = int(partes[1].replace("$", ""))
-            rs = int(partes[2].replace("$", ""))
-            rt = int(partes[3].replace("$", ""))
 
-            op = "000000"
-            shft = "00000"
-            funct = Operaciones[operacion]
+        if not operacion in Operaciones:
+            return "Operacion no reconocida"
 
-            bin_rs = format(rs, '05b')
-            bin_rt = format(rt, '05b')
-            bin_rd = format(rd, '05b')
+        rd = int(partes[1].replace("$", ""))
+        rs = int(partes[2].replace("$", ""))
+        rt = int(partes[3].replace("$", ""))
 
-            return op + bin_rs + bin_rt + bin_rd + shft + funct
-        else:
-            return "Operación no reconocida"
+        op = "000000"
+        shft = "00000"
+        funct = Operaciones[operacion]
+
+        # Format to a 5 bit binary
+        bin_rs = format(rs, '05b')
+        bin_rt = format(rt, '05b')
+        bin_rd = format(rd, '05b')
+
+        return f"{op}_{bin_rs}_{bin_rt}_{bin_rd}_{shft}_{funct}"
+
     except Exception as e:
         return f"Error: {e}"
 
@@ -34,9 +37,13 @@ def convertir_manual():
     instrucciones = entrada.get("1.0", "end-1c").strip().splitlines()
     resultado = ""
     for idx, linea in enumerate(instrucciones, start=1):
-        if linea.strip():
-            binario = decodificar_linea(linea)
-            resultado += f"Instrucción {idx}: {binario}\n"
+
+        if not linea.strip():
+            continue
+
+        binario = decodificar_linea(linea)
+        resultado += f"{binario}\n"
+
     mostrar_resultado(resultado)
 
 def mostrar_resultado(res):
@@ -48,28 +55,38 @@ def Seleccionar():
         title="Selecciona un archivo de texto",
         filetypes=[("Archivos de texto", "*.txt")]
     )
-    if ruta:
-        resultado = ""
-        try:
-            with open(ruta, "r") as archivo:
-                lineas = archivo.readlines()
-                for idx, linea in enumerate(lineas, start=0):
-                    linea = linea.strip()
-                    if linea:
-                        binario = decodificar_linea(linea)
-                        resultado += f"Instrucción {idx}: {binario}\n"
-            mostrar_resultado(resultado)
-        except Exception as e:
-            mostrar_resultado(f"Error al abrir el archivo: {e}")
+    if not ruta:
+        return
+
+    resultado = ""
+    try:
+        with open(ruta, "r") as archivo:
+            lineas = archivo.readlines()
+            for idx, linea in enumerate(lineas, start=0):
+
+                # Ver si la linea existe
+                if not (linea := linea.strip()):
+                    continue
+
+                binario = decodificar_linea(linea)
+                resultado += f"{binario}\n"
+
+        mostrar_resultado(resultado)
+
+    except Exception as e:
+        mostrar_resultado(f"Error al abrir el archivo: {e}")
 
 def guardar():
     contenido = entrada.get("1.0", "end-1c")
+
     with open("Binarios.txt", "a") as binarios:
         binarios.write(contenido + "\n")
+
     ventana_exito = tkinter.Toplevel()
     ventana_exito.configure(bg="grey30")
     ventana_exito.title("¡Archivo Guardado!")
-    ventana_exito.geometry("300x150")
+    ventana_exito.geometry("300x150")   
+
     TextoE = tkinter.Label(ventana_exito, text="¡Archivo guardado exitosamente!", bg="royalblue", fg="white", font=("BOLD", 13))
     TextoE.pack(pady=50)
 
