@@ -7,7 +7,7 @@ Operaciones = {
     "or": "001101"
 }
 
-def decodificar_linea(instruccion):
+def decodificar_linea(instruccion: str) -> None:
     try:
         partes = instruccion.replace(",", "").split()
         operacion = partes[0].lower()
@@ -33,10 +33,10 @@ def decodificar_linea(instruccion):
     except Exception as e:
         return f"Error: {e}"
 
-def convertir_manual():
+def convertir_manual() -> None:
     instrucciones = entrada.get("1.0", "end-1c").strip().splitlines()
     resultado = ""
-    for idx, linea in enumerate(instrucciones, start=1):
+    for linea in instrucciones:
 
         if not linea.strip():
             continue
@@ -46,15 +46,16 @@ def convertir_manual():
 
     mostrar_resultado(resultado)
 
-def mostrar_resultado(res):
+def mostrar_resultado(res: str) -> None:
     entrada.delete("1.0", tkinter.END)
     entrada.insert(tkinter.END, res)
 
-def Seleccionar():
+def Seleccionar() -> None:
     ruta = filedialog.askopenfilename(
         title="Selecciona un archivo de texto",
         filetypes=[("Archivos de texto", "*.txt")]
     )
+
     if not ruta:
         return
 
@@ -62,7 +63,7 @@ def Seleccionar():
     try:
         with open(ruta, "r") as archivo:
             lineas = archivo.readlines()
-            for idx, linea in enumerate(lineas, start=0):
+            for linea in lineas:
 
                 # Ver si la linea existe
                 if not (linea := linea.strip()):
@@ -76,7 +77,7 @@ def Seleccionar():
     except Exception as e:
         mostrar_resultado(f"Error al abrir el archivo: {e}")
 
-def guardar():
+def guardar() -> None:
     contenido = entrada.get("1.0", "end-1c")
 
     with open("Binarios.txt", "a") as binarios:
