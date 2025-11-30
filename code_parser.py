@@ -46,7 +46,9 @@ def parseline(instruction: str) -> str:
     result = ""
     for i, line in enumerate(tokens): # Get the line number with i
         """
+
         Syntax Analizer
+        
         """
         if not line or line[0][0] == "#": # Check if theres code or a comment
             continue
